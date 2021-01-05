@@ -5,7 +5,6 @@ const sendShotType = (data, socket, io, roomsCreated) => {
     const shots = roomsCreated[roomName].shots;
 
     roomsCreated[roomName].shots = [...shots, { username, shotType }];
-    console.log(roomsCreated[roomName]);
 
     const playerOne = roomsCreated[roomName].shots[0];
     const playerTwo = roomsCreated[roomName].shots[1];
@@ -20,8 +19,7 @@ const sendShotType = (data, socket, io, roomsCreated) => {
         {
             roomsCreated[roomName].scores = { ...scores, [winner]: scores[winner] + 1 };
         }
-            roomsCreated[roomName].winner = winner;
-        console.log(scores, roomsCreated[roomName], winner);
+        roomsCreated[roomName].winner = winner;
         io.to(roomName).emit("game result", roomsCreated[roomName]);
     }
 };
