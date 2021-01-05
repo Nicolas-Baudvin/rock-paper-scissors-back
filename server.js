@@ -56,7 +56,8 @@ server.listen(port);
 const io = require("socket.io")(server, {
     "cors": {
         "origin": "https://rockpaperscissors-game.herokuapp.com/",
-        "methods": ["GET", "POST"]
+        "methods": ["GET", "POST"],
+        "credentials": true
     }
 });
 
