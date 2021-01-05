@@ -5,7 +5,6 @@ const generateId = (username) => {
 
     const result = id.concat("-", username);
     
-    console.log(id);
     return result;
 };
 
