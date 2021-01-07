@@ -1,29 +1,60 @@
-const disconnect = (roomsCreated, socket, io) => {
+const removeUserFromDB = (usersCreated, usersCreatedPropsKey, socketID) => {
+    usersCreatedPropsKey.forEach((username) => {
+        if (usersCreated[username].socketID === socketID)
+        {
+            delete usersCreated[username];
+            return;
+        }
+    });
+};
+
+const removeRoomFromDB = (roomsCreated, room) => delete roomsCreated[room];
+
+const updateRoom = (roomsCreated, room, newUsersArray) => {
+    const lastUser = newUsersArray[0];
+    const roomUpdated = roomsCreated[room];
+
+    roomUpdated.users = newUsersArray;
+    roomUpdated.owner = lastUser;
+    roomUpdated.scores = { [lastUser.username]: 0 };
+
+    return roomUpdated;
+};
+
+const removeUserFromRoom = (roomsCreated, roomsKey, socket, io) => {
+    roomsKey.forEach((name) => {
+        if (roomsCreated[name].users.length && roomsCreated[name].users[0].id === socket.id || roomsCreated[name].users[1].id === socket.id)
+        {
+            const newUsersArray = roomsCreated[name].users.filter((user) => user.id !== socket.id);
+
+            if (!newUsersArray.length)
+            {
+                removeRoomFromDB(roomsCreated, name);
+                return;
+            }
+            const roomUpdated = updateRoom(roomsCreated, name, newUsersArray);
+
+            roomsCreated[name] = roomUpdated;
+
+            return io.to(name).emit("user leave", roomsCreated[name]);
+        }
+    });
+};
+
+const disconnect = (roomsCreated, usersCreated, socket, io) => {
 
     console.log("Déconnexion d'un utilisateur");
     const roomsKey = Object.keys(roomsCreated);
+    const usersCreatedPropsKey = Object.keys(usersCreated);
 
-    if (roomsKey.length) {
-        roomsKey.forEach((room) => {
-            console.log("Salle : ", roomsCreated[room]);
-            if (roomsCreated[room].users[0].id === socket.id || roomsCreated[room].users[1].id === socket.id) {
-                console.log(`Supression de l'utilisateur de la salle ${room}`);
-                const newUsersArray = roomsCreated[room].users.filter((user) => user.id !== socket.id);
+    if (usersCreatedPropsKey.length)
+    {
+        removeUserFromDB(usersCreated, usersCreatedPropsKey, socket.id);
+    }
 
-                if (!newUsersArray.length) {
-                    delete roomsCreated[room];
-                    console.log("Suppression de la salle", room);
-                    return;
-                }
-                
-                const lastUser = newUsersArray[0];
-
-                roomsCreated[room].users = newUsersArray;
-                roomsCreated[room].owner = lastUser;
-                roomsCreated[room].scores = { [lastUser.username]: 0 };
-                return io.to(room).emit("user leave", roomsCreated[room]);
-            }
-        });
+    if (roomsKey.length)
+    {
+        removeUserFromRoom(roomsCreated, roomsKey, socket, io);
     }
 
 };
