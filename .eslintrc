@@ -35,7 +35,6 @@
 
         "accessor-pairs": 2,
         "block-scoped-var": 2,
-        "curly": 2,
         "default-case": 2,
         "dot-location": [2, "property"],
         "dot-notation": 2,
@@ -95,9 +94,6 @@
 
         "array-bracket-spacing": [0, "always"],
         "block-spacing": [2, "always"],
-        "brace-style": [2, "1tbs", {
-            "allowSingleLine": false
-        }],
         "comma-spacing": [2, {
             "before": false,
             "after": true
