@@ -1,4 +1,4 @@
-const removeUserFromDB = (usersCreated, usersCreatedPropsKey, socketID) => {
+const removeUserFromDataBaseBySocketID = (usersCreated, usersCreatedPropsKey, socketID) => {
     usersCreatedPropsKey.forEach((username) => {
         if (usersCreated[username].socketID === socketID)
         {
@@ -8,7 +8,7 @@ const removeUserFromDB = (usersCreated, usersCreatedPropsKey, socketID) => {
     });
 };
 
-const removeRoomFromDB = (roomsCreated, room) => delete roomsCreated[room];
+const removeRoomFromDataBase = (roomsCreated, room) => delete roomsCreated[room];
 
 const updateRoom = (roomsCreated, room, newUsersArray) => {
     const lastUser = newUsersArray[0];
@@ -29,7 +29,7 @@ const removeUserFromRoom = (roomsCreated, roomsKey, socket, io) => {
 
             if (!newUsersArray.length)
             {
-                removeRoomFromDB(roomsCreated, name);
+                removeRoomFromDataBase(roomsCreated, name);
                 return;
             }
             const roomUpdated = updateRoom(roomsCreated, name, newUsersArray);
@@ -42,21 +42,18 @@ const removeUserFromRoom = (roomsCreated, roomsKey, socket, io) => {
 };
 
 const disconnect = (roomsCreated, usersCreated, socket, io) => {
-
-    console.log("Déconnexion d'un utilisateur");
     const roomsKey = Object.keys(roomsCreated);
     const usersCreatedPropsKey = Object.keys(usersCreated);
 
     if (usersCreatedPropsKey.length)
     {
-        removeUserFromDB(usersCreated, usersCreatedPropsKey, socket.id);
+        removeUserFromDataBaseBySocketID(usersCreated, usersCreatedPropsKey, socket.id);
     }
 
     if (roomsKey.length)
     {
         removeUserFromRoom(roomsCreated, roomsKey, socket, io);
     }
-
 };
 
 module.exports = disconnect;
